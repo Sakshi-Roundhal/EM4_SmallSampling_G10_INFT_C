@@ -74,9 +74,9 @@ def calculate_t_test(ai_errors, human_errors):
     # Cohen's d: effect size = mean_diff / std_dev
     cohens_d = mean_diff / std_dev_diff if std_dev_diff != 0 else 0
     
-    # 95% Confidence interval (approx critical t value = 2.262 for df=9)
-    # Using approx 2.0 for simpler logic if df isn't 9, but we can just use 2.262 for n=10.
-    t_crit = 2.262 if n == 10 else 2.0
+    # 95% Confidence interval (approx critical t value = 2.045 for df=29)
+    # Using approx 2.0 for simpler logic if df isn't 29, but we can just use 2.045 for n=30.
+    t_crit = 2.045 if n == 30 else 2.0
     # Guard: if std_dev_diff == 0, no spread → CI collapses to the mean
     margin_error = t_crit * (std_dev_diff / math.sqrt(n)) if std_dev_diff != 0 else 0.0
     ci_lower = mean_diff - margin_error

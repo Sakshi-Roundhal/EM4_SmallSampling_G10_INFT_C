@@ -10,7 +10,7 @@ const MONO = { fontFamily: "'JetBrains Mono','Fira Code',ui-monospace,monospace"
 
 /* ── α configuration ─────────────────────────────────── */
 const ALPHA_OPTS = [0.01, 0.05, 0.10];
-const CRIT_T     = { 0.01: 3.250, 0.05: 2.262, 0.10: 1.833 };
+const CRIT_T     = { 0.01: 2.756, 0.05: 2.045, 0.10: 1.699 };
 
 /* ── Client-side t-test math (mirrors backend/math_utils.py) ── */
 function approxPValue(tStat, df) {
@@ -46,7 +46,7 @@ function computeAnalysis(students, preds) {
   const df       = n - 1;
   const pValue   = approxPValue(tStat, df);
   const cohensD  = stdDev === 0 ? 0 : meanDiff / stdDev;
-  const tCrit95  = 2.262; // fixed CI uses 95%
+  const tCrit95  = 2.045; // fixed CI uses 95% (df=29)
   const margin   = stdDev === 0 ? 0 : tCrit95 * (stdDev / Math.sqrt(n));
 
   return {
@@ -107,7 +107,7 @@ const AlphaSelector = ({ alpha, setAlpha }) => (
       ))}
     </div>
     <span style={{ ...MONO, fontSize: 13, color: 'var(--text-muted)' }}>
-      Critical t-value (df=9): <span style={{ color: 'var(--text-muted)' }}>±{CRIT_T[alpha].toFixed(3)}</span>
+      Critical t-value (df=29): <span style={{ color: 'var(--text-muted)' }}>±{CRIT_T[alpha].toFixed(3)}</span>
     </span>
   </div>
 );
@@ -130,7 +130,7 @@ export default function App() {
     setFetching(true); setErr('');
     setPreds({}); 
     try {
-      const { data } = await axios.get(`${API}/generate-sample?n=10`);
+      const { data } = await axios.get(`${API}/generate-sample?n=30`);
       setStudents(data.students);
       const blank = {};
       data.students.forEach(s => { blank[s.id] = '0'; });
@@ -194,7 +194,7 @@ export default function App() {
           <div className="card fade-up">
             <div className="card-label teal">Student Dataset Sample</div>
             <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
-              10 randomly generated students · EndSem hidden · AI predictions pre-computed
+              30 randomly generated students · EndSem hidden · AI predictions pre-computed
             </p>
             <table className="data-table">
               <thead>
@@ -317,7 +317,7 @@ export default function App() {
               boxShadow: 'var(--shadow)',
             }}>
               <div className="card-label teal" style={{ marginBottom: 18 }}>
-                T-Distribution · df = 9
+                T-Distribution · df = 29
               </div>
               <TDistChart tStat={math?.t_stat ?? null} critVal={critT} />
             </div>

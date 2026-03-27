@@ -45,7 +45,7 @@ def train_model():
 model = train_model()
 
 @app.get("/generate-sample")
-def generate_sample(n: int = 10):
+def generate_sample(n: int = 30):
     """Generate a sample of N students."""
     students = []
     for i in range(n):
