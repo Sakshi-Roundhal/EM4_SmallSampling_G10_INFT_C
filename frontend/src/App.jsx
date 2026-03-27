@@ -370,6 +370,77 @@ export default function App() {
                   </tr>
                 </tfoot>
               </table>
+
+              {/* ── Winner Summary Banner ── */}
+              {(() => {
+                const aiWinsCount    = results.filter(r => r.AIError < r.HumanError).length;
+                const humanWinsCount = results.filter(r => r.HumanError < r.AIError).length;
+                const tiesCount      = results.filter(r => r.AIError === r.HumanError).length;
+                const overallWinner  = +meanAI < +meanHuman ? 'AI' : +meanHuman < +meanAI ? 'Human' : 'Tie';
+                const winnerColor    = overallWinner === 'AI' ? 'var(--accent-blue)' : overallWinner === 'Human' ? '#10B981' : 'var(--text-muted)';
+                const winnerBg       = overallWinner === 'AI' ? 'rgba(79,110,247,0.06)' : overallWinner === 'Human' ? 'rgba(16,185,129,0.06)' : '#F8FAFC';
+                const winnerBorder   = overallWinner === 'AI' ? 'rgba(79,110,247,0.25)' : overallWinner === 'Human' ? 'rgba(16,185,129,0.25)' : 'var(--border)';
+                return (
+                  <div style={{
+                    margin: '0 0 0 0',
+                    padding: '16px 24px',
+                    borderTop: '2px solid var(--border)',
+                    background: winnerBg,
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap',
+                  }}>
+                    {/* Win count pills */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                      <span style={{ fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 4 }}>
+                        Round Wins
+                      </span>
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 5,
+                        padding: '4px 12px', borderRadius: 9999, fontSize: 13, fontWeight: 700,
+                        background: 'rgba(79,110,247,0.10)', color: 'var(--accent-blue)', border: '1px solid rgba(79,110,247,0.2)',
+                      }}>
+                        <Bot size={12}/> AI — {aiWinsCount}
+                      </span>
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 5,
+                        padding: '4px 12px', borderRadius: 9999, fontSize: 13, fontWeight: 700,
+                        background: 'rgba(16,185,129,0.10)', color: '#059669', border: '1px solid rgba(16,185,129,0.2)',
+                      }}>
+                        <User size={12}/> Human — {humanWinsCount}
+                      </span>
+                      {tiesCount > 0 && (
+                        <span style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 5,
+                          padding: '4px 12px', borderRadius: 9999, fontSize: 13, fontWeight: 700,
+                          background: '#F1F5F9', color: 'var(--text-muted)', border: '1px solid var(--border)',
+                        }}>
+                          Ties — {tiesCount}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Overall Winner */}
+                    <div style={{
+                      display: 'flex', alignItems: 'center', gap: 10,
+                      padding: '10px 20px', borderRadius: 10,
+                      border: `1.5px solid ${winnerBorder}`,
+                      background: '#fff',
+                    }}>
+                      <span style={{ fontSize: 20 }}>🏆</span>
+                      <div>
+                        <p style={{ fontFamily: 'var(--font-sans)', fontSize: 11, fontWeight: 600, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 2 }}>
+                          Overall Winner
+                        </p>
+                        <p style={{ fontFamily: 'var(--font-sans)', fontSize: 16, fontWeight: 800, color: winnerColor, letterSpacing: '-0.01em' }}>
+                          {overallWinner === 'AI' ? 'AI Model' : overallWinner === 'Human' ? 'Human' : 'It\'s a Tie'}
+                          <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-muted)', marginLeft: 8 }}>
+                            (lower mean error: {overallWinner === 'AI' ? meanAI : overallWinner === 'Human' ? meanHuman : `${meanAI} = ${meanHuman}`})
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Charts */}
