@@ -27,8 +27,11 @@ This project answers a concrete statistical question: **is an AI model's predict
 **The statistical connection:** For each student, the absolute prediction error is computed for both the AI (`|Actual − AIPred|`) and the human (`|Actual − HumanPred|`). These 30 paired error values are fed into a **manually implemented paired t-test** in `math_utils.py` — written from scratch using only Python's built-in `math` module. The test determines whether the mean difference in errors is statistically significant, or merely due to chance. 
 
 ---
-
-![Alt text](./img.png)
+## UI Screenshot
+![Alt text](./UI_Img/img1.png)
+![Alt text](./UI_Img/img2.png)
+![Alt text](./UI_Img/img3.png)
+![Alt text](./UI_Img/img4.png)
 
 ## End-to-End Installation & Running Guide
 
