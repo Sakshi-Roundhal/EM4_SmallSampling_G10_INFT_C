@@ -10,7 +10,7 @@ const MONO = { fontFamily: "'JetBrains Mono','Fira Code',ui-monospace,monospace"
 
 /* ── α configuration ─────────────────────────────────── */
 const ALPHA_OPTS = [0.01, 0.05, 0.10];
-const CRIT_T     = { 0.01: 2.756, 0.05: 2.045, 0.10: 1.699 };
+const CRIT_T     = { 0.01: 2.797, 0.05: 2.064, 0.10: 1.711 };
 
 /* ── Client-side t-test math (mirrors backend/math_utils.py) ── */
 function approxPValue(tStat, df) {
@@ -46,7 +46,7 @@ function computeAnalysis(students, preds) {
   const df       = n - 1;
   const pValue   = approxPValue(tStat, df);
   const cohensD  = stdDev === 0 ? 0 : meanDiff / stdDev;
-  const tCrit95  = 2.045; // fixed CI uses 95% (df=29)
+  const tCrit95  = 2.064; // fixed CI uses 95% (df=24)
   const margin   = stdDev === 0 ? 0 : tCrit95 * (stdDev / Math.sqrt(n));
 
   return {
@@ -107,9 +107,63 @@ const AlphaSelector = ({ alpha, setAlpha }) => (
       ))}
     </div>
     <span style={{ ...MONO, fontSize: 13, color: 'var(--text-muted)' }}>
-      Critical t-value (df=29): <span style={{ color: 'var(--text-muted)' }}>±{CRIT_T[alpha].toFixed(3)}</span>
+      Critical t-value (df=24): <span style={{ color: 'var(--text-muted)' }}>±{CRIT_T[alpha].toFixed(3)}</span>
     </span>
   </div>
+);
+
+/* ── Navbar ──────────────────────────────────────────── */
+const Navbar = () => (
+  <nav style={{
+    position: 'sticky',
+    top: 0,
+    zIndex: 100,
+    background: 'rgba(255, 255, 255, 0.25)',
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.4)',
+    boxShadow: '0 4px 32px -12px rgba(0, 0, 0, 0.1)',
+    padding: '14px 56px',
+    display: 'flex',
+    justifyContent: 'center',
+    gap: 32,
+    transition: 'all 0.3s ease'
+  }}>
+    {[
+      { label: 'Dataset', href: '#dataset' },
+      { label: 'T-Distribution', href: '#tdist' },
+      { label: 'Comparison Matrix', href: '#matrix' },
+      { label: 'Graphs', href: '#graphs' },
+      { label: 'Mathematical Derivation', href: '#math' }
+    ].map(link => (
+      <a
+        key={link.href}
+        href={link.href}
+        style={{
+          fontFamily: 'var(--font-sans)',
+          fontSize: 13,
+          fontWeight: 600,
+          color: 'var(--text-primary)',
+          textDecoration: 'none',
+          letterSpacing: '0.04em',
+          textTransform: 'uppercase',
+          padding: '8px 16px',
+          borderRadius: 8,
+          transition: 'all 0.2s ease',
+        }}
+        onMouseEnter={e => {
+          e.currentTarget.style.background = 'rgba(79, 110, 247, 0.08)';
+          e.currentTarget.style.color = 'var(--accent-blue)';
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.background = 'transparent';
+          e.currentTarget.style.color = 'var(--text-primary)';
+        }}
+      >
+        {link.label}
+      </a>
+    ))}
+  </nav>
 );
 
 /* ── App ─────────────────────────────────────────────── */
@@ -130,7 +184,7 @@ export default function App() {
     setFetching(true); setErr('');
     setPreds({}); 
     try {
-      const { data } = await axios.get(`${API}/generate-sample?n=30`);
+      const { data } = await axios.get(`${API}/generate-sample?n=25`);
       setStudents(data.students);
       const blank = {};
       data.students.forEach(s => { blank[s.id] = '0'; });
@@ -160,10 +214,13 @@ export default function App() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-base)' }}>
 
+      {/* ── NAVBAR ── */}
+      <Navbar />
+
       {/* ── HEADER ── */}
       <div style={{ borderBottom: '1px solid var(--border)', background: 'transparent' }}>
         <div style={{ ...page, paddingTop: 0, paddingBottom: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 28, paddingBottom: 28 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 15, paddingBottom: 15 }}>
             <div>
               <h1 style={{ fontFamily: 'var(--font-sans)', fontSize: 28, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
                 AI vs Human — Paired t-Test
@@ -188,32 +245,32 @@ export default function App() {
         )}
 
         {/* ── ROW 1: Dataset + Inputs ── */}
-        <div style={{ marginBottom: 24, display: 'grid', gridTemplateColumns: '1.45fr 1fr', gap: 16 }}>
+        <div id="dataset" style={{ scrollMarginTop: 85, marginBottom: 24, display: 'grid', gridTemplateColumns: '1.45fr 1fr', gap: 16 }}>
 
           {/* Dataset card */}
           <div className="card fade-up">
             <div className="card-label teal">Student Dataset Sample</div>
             <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
-              30 randomly generated students · EndSem hidden · AI predictions pre-computed
+              25 randomly generated students · EndSem hidden · AI predictions pre-computed
             </p>
             <table className="data-table">
               <thead>
-                <tr>
-                  {['#', 'Mid-1', 'Mid-2', 'Internal', 'Attend.', 'Study h', 'Sleep h', 'AI Pred'].map(h => (
-                    <th key={h}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {students.length === 0
-                  ? <tr><td colSpan={8} style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-muted)' }}>{fetching ? 'Generating…' : 'No data'}</td></tr>
-                  : students.map(s => (
-                    <tr key={s.id}>
-                      <td style={{ color: 'var(--text-muted)', fontWeight: 500 }}>S{String(s.id).padStart(2,'0')}</td>
-                      <td>{s.Mid1}</td><td>{s.Mid2}</td><td>{s.Internal}</td>
-                      <td>{s.Attendance}</td><td>{s.StudyHours}</td><td>{s.SleepHours}</td>
-                      <td style={{ color: 'var(--accent-blue)', fontWeight: 600 }}>{s.AIPred ?? '—'}</td>
-                    </tr>
+                  <tr>
+                    {['#', 'Mid-1', 'Mid-2', 'Internal', 'Attend.', 'Study h', 'Sleep h', 'AI Pred'].map(h => (
+                      <th key={h}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {students.length === 0
+                    ? <tr><td colSpan={8} style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-muted)' }}>{fetching ? 'Generating…' : 'No data'}</td></tr>
+                    : students.map(s => (
+                      <tr key={s.id}>
+                        <td style={{ color: 'var(--text-muted)', fontWeight: 500 }}>S{String(s.id).padStart(2,'0')}</td>
+                        <td>{s.Mid1}</td><td>{s.Mid2}</td><td>{s.Internal}</td>
+                        <td>{s.Attendance}</td><td>{s.StudyHours}</td><td>{s.SleepHours}</td>
+                        <td style={{ color: 'var(--accent-blue)', fontWeight: 600 }}>{s.AIPred ?? '—'}</td>
+                      </tr>
                   ))}
               </tbody>
             </table>
@@ -229,21 +286,21 @@ export default function App() {
             <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 18, marginTop: 6 }}>
               Type to update results instantly — no button required.
             </p>
-            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px 12px' }}>
+            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 16, rowGap: 8, alignContent: 'space-between', marginBottom: 16 }}>
               {students.map(s => (
-                <div key={s.id}>
-                  <div style={{ fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 600, letterSpacing: '0.04em',
-                                textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>
+                <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 700, letterSpacing: '0.04em',
+                                textTransform: 'uppercase', color: 'var(--text-muted)', width: 26, flexShrink: 0 }}>
                     S{String(s.id).padStart(2,'0')}
                   </div>
                   <input
                     type="number"
-                    className="input"
+                    className="input input-sm"
                     placeholder="—"
                     min={0} max={100}
                     value={preds[s.id] ?? ''}
                     onChange={e => change(s.id, e.target.value)}
-                    style={isInvalid(s.id) ? { borderColor: 'var(--accent-red)' } : {}}
+                    style={{ flex: 1, ...(isInvalid(s.id) ? { borderColor: 'var(--accent-red)' } : {}) }}
                   />
                 </div>
               ))}
@@ -264,8 +321,9 @@ export default function App() {
         {/* ── RESULTS (always visible once students loaded) ── */}
         {results && (
           <div>
-            {/* Metric cards */}
-            <div style={{ marginBottom: 20, display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14 }}>
+            {/* ── METRICS & T-DIST ── */}
+            <div id="tdist" style={{ scrollMarginTop: 85 }}>
+              <div style={{ marginBottom: 20, display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14 }}>
               <MetricCard label="Mean AI Error"    value={meanAI}    accentColor="var(--accent-green)" valueColor="var(--accent-green)" sub={aiWins ? 'AI outperformed human' : 'AI underperformed'} />
               <MetricCard label="Mean Human Error" value={meanHuman} accentColor="var(--accent-red)"   valueColor="var(--accent-red)"   sub={!aiWins ? 'Human outperformed AI' : 'Human underperformed'} />
               <MetricCard label="t-Statistic"      value={math?.t_stat?.toFixed(3)}  accentColor="var(--accent-teal)" valueColor="var(--text-primary)" sub={`df = ${math?.df} · two-tailed`} />
@@ -317,56 +375,57 @@ export default function App() {
               boxShadow: 'var(--shadow)',
             }}>
               <div className="card-label teal" style={{ marginBottom: 18 }}>
-                T-Distribution · df = 29
+                T-Distribution · df = 24
               </div>
               <TDistChart tStat={math?.t_stat ?? null} critVal={critT} />
+              </div>
             </div>
 
             {/* Prediction comparison matrix */}
-            <div style={{ marginBottom: 24, background: '#FFFFFF', border: '1px solid var(--border)', borderRadius: 16, overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
+            <div id="matrix" style={{ scrollMarginTop: 85, marginBottom: 24, background: '#FFFFFF', border: '1px solid var(--border)', borderRadius: 16, overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
               <div style={{ padding: '18px 24px', borderBottom: '1px solid var(--border)' }}>
                 <div className="card-label green" style={{ marginBottom: 0 }}>Prediction Comparison Matrix</div>
               </div>
               <table className="data-table">
                 <thead>
-                  <tr>
-                    {['Student','Actual','AI Pred','Human Pred','AI Error','Human Error','Superior'].map((h, i) => (
-                      <th key={i} style={{ paddingLeft: i === 0 ? 24 : 14 }}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {results.map(r => {
-                    const aiBetter = r.AIError < r.HumanError;
-                    const tie      = r.AIError === r.HumanError;
-                    return (
-                      <tr key={r.id}>
-                        <td style={{ color: 'var(--text-muted)', paddingLeft: 24, fontWeight: 500 }}>S{String(r.id).padStart(2,'00')}</td>
-                        <td style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{r.Actual}</td>
-                        <td style={{ color: 'var(--accent-blue)', fontWeight: 600 }}>{r.AIPred}</td>
-                        <td style={{ color: 'var(--accent-red)', fontWeight: 600 }}>{r.HumanPred}</td>
-                        <td style={{ color: 'var(--accent-blue)' }}>{r.AIError}</td>
-                        <td style={{ color: !aiBetter && !tie ? 'var(--accent-red)' : 'var(--text-muted)' }}>{r.HumanError}</td>
-                        <td>
-                          {tie
-                            ? <span className="pill pill-muted">Tie</span>
-                            : aiBetter
-                              ? <span className="pill pill-blue"><Bot size={10}/> AI</span>
-                              : <span className="pill pill-green"><User size={10}/> Human</span>
-                          }
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td colSpan={4} style={{ paddingLeft: 24, color: 'var(--text-muted)', fontSize: 13, textAlign: 'right' }}>
-                      Aggregate mean errors →
-                    </td>
-                    <td style={{ color: 'var(--accent-blue)', fontWeight: 700 }}>{meanAI}</td>
-                    <td style={{ color: 'var(--accent-red)', fontWeight: 700 }}>{meanHuman}</td>
-                    <td />
+                    <tr>
+                      {['Student','Actual','AI Pred','Human Pred','AI Error','Human Error','Superior'].map((h, i) => (
+                        <th key={i} style={{ paddingLeft: i === 0 ? 24 : 14 }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {results.map(r => {
+                      const aiBetter = r.AIError < r.HumanError;
+                      const tie      = r.AIError === r.HumanError;
+                      return (
+                        <tr key={r.id}>
+                          <td style={{ color: 'var(--text-muted)', paddingLeft: 24, fontWeight: 500 }}>S{String(r.id).padStart(2,'00')}</td>
+                          <td style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{r.Actual}</td>
+                          <td style={{ color: 'var(--accent-blue)', fontWeight: 600 }}>{r.AIPred}</td>
+                          <td style={{ color: 'var(--accent-red)', fontWeight: 600 }}>{r.HumanPred}</td>
+                          <td style={{ color: 'var(--accent-blue)' }}>{r.AIError}</td>
+                          <td style={{ color: !aiBetter && !tie ? 'var(--accent-red)' : 'var(--text-muted)' }}>{r.HumanError}</td>
+                          <td>
+                            {tie
+                              ? <span className="pill pill-muted">Tie</span>
+                              : aiBetter
+                                ? <span className="pill pill-blue"><Bot size={10}/> AI</span>
+                                : <span className="pill pill-green"><User size={10}/> Human</span>
+                            }
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colSpan={4} style={{ paddingLeft: 24, color: 'var(--text-muted)', fontSize: 13, textAlign: 'right' }}>
+                        Aggregate mean errors →
+                      </td>
+                      <td style={{ color: 'var(--accent-blue)', fontWeight: 700 }}>{meanAI}</td>
+                      <td style={{ color: 'var(--accent-red)', fontWeight: 700 }}>{meanHuman}</td>
+                      <td />
                   </tr>
                 </tfoot>
               </table>
@@ -444,7 +503,7 @@ export default function App() {
             </div>
 
             {/* Charts */}
-            <div style={{ marginBottom: 24, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div id="graphs" style={{ scrollMarginTop: 85, marginBottom: 24, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div className="card" style={{ height: 380, display: 'flex', flexDirection: 'column', background: '#FFFFFF' }}>
                 <div className="card-label blue" style={{ marginBottom: 12 }}>Error Magnitude Comparison</div>
                 <div style={{ flex: 1, position: 'relative' }}>
@@ -460,7 +519,9 @@ export default function App() {
             </div>
 
             {/* Math derivation */}
-            <MathPanel mathProps={math} />
+            <div id="math" style={{ scrollMarginTop: 85 }}>
+              <MathPanel mathProps={math} />
+            </div>
           </div>
         )}
       </div>

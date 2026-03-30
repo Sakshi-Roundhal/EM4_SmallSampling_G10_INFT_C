@@ -24,7 +24,7 @@
 
 This project answers a concrete statistical question: **is an AI model's prediction of student end-semester scores significantly more accurate than a human's intuitive guess?** The system relies on a custom implementation of a **paired t-test** to analyze the difference between AI prediction accuracy and Human prediction accuracy. 
 
-**The statistical connection:** For each student, the absolute prediction error is computed for both the AI (`|Actual − AIPred|`) and the human (`|Actual − HumanPred|`). These 30 paired error values are fed into a **manually implemented paired t-test** in `math_utils.py` — written from scratch using only Python's built-in `math` module. The test determines whether the mean difference in errors is statistically significant, or merely due to chance. 
+**The statistical connection:** For each student, the absolute prediction error is computed for both the AI (`|Actual − AIPred|`) and the human (`|Actual − HumanPred|`). These 25 paired error values are fed into a **manually implemented paired t-test** in `math_utils.py` — written from scratch using only Python's built-in `math` module. The test determines whether the mean difference in errors is statistically significant, or merely due to chance. 
 
 ---
 ## UI Screenshot
@@ -67,7 +67,7 @@ npm run sakshi           # Keep this terminal open
 
 ## Why Paired t-Test?
 
-The choice of paired t-test is determined directly by the structure of the code in `app.py`. The endpoint `/generate-sample` returns **the same 30 students** to both the AI (which predicts immediately) and the human (who enters predictions for those same students). This creates paired observations — for every student `i`, there is exactly one `AIError_i` and one `HumanError_i`, both anchored to the same ground-truth `Actual_i` score.
+The choice of paired t-test is determined directly by the structure of the code in `app.py`. The endpoint `/generate-sample` returns **the same 25 students** to both the AI (which predicts immediately) and the human (who enters predictions for those same students). This creates paired observations — for every student `i`, there is exactly one `AIError_i` and one `HumanError_i`, both anchored to the same ground-truth `Actual_i` score.
 
 | Condition | Evidence in the code |
 |-----------|----------------------|
@@ -108,7 +108,7 @@ There is no static CSV file. The dataset is **generated in memory** every time t
 ##  Methodology & Code Explanation
 
 ### Manual t-Test Implementation & Hypotheses
-Because the AI and the Human are evaluating the **exact same 30 students**, the observations are dependent. We manually built a **Paired t-Test** without `scipy` or `statsmodels` to prove statistical significance in `math_utils.py`.
+Because the AI and the Human are evaluating the **exact same 25 students**, the observations are dependent. We manually built a **Paired t-Test** without `scipy` or `statsmodels` to prove statistical significance in `math_utils.py`.
 
 - **H₀ (Null Hypothesis):** Mean difference in prediction errors (AI vs Human) is zero.
 - **H₁ (Alternate Hypothesis):** Mean difference in errors is NOT zero (Two-Tailed test).
@@ -246,7 +246,7 @@ README.md              # Project Documentation
 
 ## Application of This Project
 
-The direct, real-world application of this specific project architecture is evaluating **whether a newly integrated AI Regression Model is actually safe and effective to deploy over existing human operations**. By using Small Sampling techniques (Paired t-Test) on exactly 30 identical records, organizations can mathematically prove whether their AI algorithm genuinely outperforms manual human appraisal, or if the perceived difference in accuracy is entirely due to random chance. 
+The direct, real-world application of this specific project architecture is evaluating **whether a newly integrated AI Regression Model is actually safe and effective to deploy over existing human operations**. By using Small Sampling techniques (Paired t-Test) on exactly 25 identical records, organizations can mathematically prove whether their AI algorithm genuinely outperforms manual human appraisal, or if the perceived difference in accuracy is entirely due to random chance. 
 
 ---
 
@@ -262,8 +262,8 @@ The direct, real-world application of this specific project architecture is eval
 ## Team Contributions (Group 10 - INFT - C)
 
 - **Sakshi Roundhal (24101C0011)** - Developed core Python backend logic and statistical sampling testing.
-- **Shreeman Kumar (24101C0002)** - Initialized frontend application environment and authored project setup instructions.
-- **Omkar Suryanarayan Padhi (24101C0003)** - Configured sample size scaling logic to 30 students and enhanced UI comparison tables.
+- **Shreeman Kumar (24101C0002)** - Initialized frontend application environment, authored project setup instructions and made README documentation.
+- **Omkar Suryanarayan Padhi (24101C0003)** - Configured sample size scaling logic to 25 students and enhanced UI comparison tables.
 - **Shreya Murkar (24101C0014)** - Architected foundational project folder structure and performed documentation reviews.
 - **Ashwin Agrawal (24101C0015)** - Authored comprehensive README documentation and integrated project UI assets/images.
 - **Neha Nayak (24101C0016)** - Built out the React frontend dashboard and integrated dynamic Chart.js visualizations.

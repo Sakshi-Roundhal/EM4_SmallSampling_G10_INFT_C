@@ -23,6 +23,7 @@
 
 /* ── Reset ─────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 html, body {
   background: var(--bg-base);
   color: var(--text-primary);
@@ -93,14 +94,18 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
 }
 .data-table thead th {
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-muted);
-  padding: 10px 14px;
+  padding: 7px 10px;
   text-align: left;
   border-bottom: 2px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #F8FAFC;
 }
 .data-table tbody tr {
   border-bottom: 1px solid var(--border);
@@ -110,16 +115,16 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
 .data-table tbody tr:hover { background: #F8FAFC; }
 .data-table tbody td {
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 12px;
   color: var(--text-primary);
-  padding: 12px 14px;
+  padding: 7px 10px;
 }
 .data-table tfoot tr { background: #F8FAFC; }
 .data-table tfoot td {
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  padding: 12px 14px;
+  padding: 8px 10px;
   border-top: 1px solid var(--border);
 }
 
@@ -143,6 +148,11 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
   box-shadow: 0 0 0 3px rgba(79,110,247,0.12);
 }
 .input::placeholder { color: var(--text-dim); }
+.input-sm {
+  padding: 5px 10px;
+  font-size: 13px;
+  border-radius: 8px;
+}
 
 /* ── Buttons ───────────────────────────────────────── */
 .btn-primary {
